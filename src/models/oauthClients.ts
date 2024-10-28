@@ -3,7 +3,7 @@ import { Mongoose } from "mongoose";
 /**
  * Define OAuth2 clients
  */
-export default function defineOauthClients(mongoose: Mongoose) {
+export default function defineOAuthClients(mongoose: Mongoose) {
 	const { Schema } = mongoose;
 	return mongoose.model(
 		"OAuthClients",

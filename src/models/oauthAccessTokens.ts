@@ -3,23 +3,20 @@ import { Mongoose } from "mongoose";
 /**
  * Define OAuth2 clients
  */
-export default function defineOAuthAuthorizationCodes(mongoose: Mongoose) {
+export default function defineOAuthAccessTokens(mongoose: Mongoose) {
 	const { Schema } = mongoose;
 	return mongoose.model(
-		"OAuthAuthorizationCodes",
+		"OAuthAccessTokens",
 		new Schema({
 			_id: {
 				type: String,
 				auto: true,
 			},
-			authorizationCode: {
+			accessToken: {
 				type: String,
 			},
-			expiresAt: {
+			accessTokenExpiresAt: {
 				type: Date,
-			},
-			redirectUri: {
-				type: String,
 			},
 			scope: {
 				type: String,
@@ -29,8 +26,8 @@ export default function defineOAuthAuthorizationCodes(mongoose: Mongoose) {
 			},
 			userId: {
 				type: String,
-			},
+			}
 		}),
-		"oauth-authorization-codes"
+		"oauth-access-tokens"
 	);
 }
