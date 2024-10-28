@@ -6,30 +6,31 @@ import { Mongoose } from "mongoose";
 export default function defineOauthClients(mongoose: Mongoose) {
 	const { Schema } = mongoose;
 	return mongoose.model(
-		"OAuthClients",
+		"OAuthAuthorizationCodes",
 		new Schema({
 			_id: {
 				type: String,
 				auto: true,
 			},
-			userId: {
+			authorizationCode: {
+				type: String,
+			},
+			expiresAt: {
+				type: Date,
+			},
+			redirectUri: {
+				type: String,
+			},
+			scope: {
 				type: String,
 			},
 			clientId: {
 				type: String,
 			},
-			clientSecret: {
+			userId: {
 				type: String,
-			},
-			callbackUrl: {
-				type: String,
-			},
-			grants: {
-				type: [String],
-				required: true,
-				enum: ["authorization_code", "refresh_token"],
 			},
 		}),
-		"oauth-clients"
+		"oauth-authorization-codes"
 	);
 }
