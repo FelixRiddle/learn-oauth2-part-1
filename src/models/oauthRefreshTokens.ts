@@ -6,7 +6,7 @@ import { Mongoose } from "mongoose";
 export default function defineOAuthRefreshTokens(mongoose: Mongoose) {
 	const { Schema } = mongoose;
 	return mongoose.model(
-		"OAuthAccessTokens",
+		"OAuthRefreshTokens",
 		new Schema({
 			_id: {
 				type: String,
