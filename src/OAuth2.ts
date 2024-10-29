@@ -164,4 +164,28 @@ export default class OAuth2 {
 			}
 		};
 	}
+	
+	/**
+	 * Get refresh token
+	 */
+	async getRefreshToken(refreshToken: string) {
+		const token: any = await this.OAuthRefreshTokens.findOne({
+			refreshToken,
+		}).lean();
+		if(!token) {
+			throw new Error("Refresh token not found");
+		}
+		
+		return {
+			refreshToken: token.refreshToken,
+		    // refreshTokenExpiresAt: token.refreshTokenExpiresAt, // never expires
+			scope: token.scope,
+			client: {
+				id: token.clientId,
+			},
+			user: {
+				id: token.userId,
+			}
+		};
+	}
 }
