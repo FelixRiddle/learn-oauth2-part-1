@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import mongooseInstance from "@/models";
+import Models from "felixriddle.mongodb-models";
 
 /**
  * Main
@@ -7,7 +7,7 @@ import mongooseInstance from "@/models";
 async function main() {
 	dotenv.config();
 	
-	const mongoose = mongooseInstance();
+	const models = new Models();
 }
 
 main();

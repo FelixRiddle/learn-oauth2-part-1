@@ -2,7 +2,6 @@
 	"devDependencies": {
 		"@types/node": "^22.8.1",
 		"@types/oauth2-server": "^3.0.18",
-		"felixriddle.ts-app-models": "^1.0.41",
 		"ts-node": "^10.9.2",
 		"tsc": "^2.0.4",
 		"tsx": "^4.19.2",
@@ -20,6 +19,8 @@
 		"dotenv": "^16.4.5",
 		"esbuild": "^0.23.1",
 		"express": "^4.21.1",
+		"felixriddle.mongodb-models": "^1.0.1",
+		"felixriddle.ts-app-models": "^1.0.41",
 		"get-tsconfig": "^4.8.1",
 		"make-error": "^1.3.6",
 		"mongoose": "^8.7.3",

@@ -1,33 +1,33 @@
-import { Model, Mongoose } from "mongoose";
 import OAuth2 from "@/OAuth2";
 import OAuth2Server, {
 	Request as OAuth2Request,
 	Response as OAuth2Response,
 } from "oauth2-server";
 import { NextFunction, Request, Response } from "express";
+import Models from "felixriddle.mongodb-models";
 
 /**
  * OAuth2 service
  */
 export default class OAuth2Service {
 	server: OAuth2Server;
-	OAuthClients: Model<any>;
-	OAuthAuthorizationCodes: Model<any>;
-	OAuthAccessTokens: Model<any>;
-	OAuthRefreshTokens: Model<any>;
+	OAuthClients;
+	OAuthAuthorizationCodes;
+	OAuthAccessTokens;
+	OAuthRefreshTokens;
+	User;
 
 	/**
 	 * Construct it
 	 */
-	constructor(mongoose: Mongoose) {
-		this.OAuthClients = mongoose.model("OAuthClients");
-		this.OAuthAuthorizationCodes = mongoose.model(
-			"OAuthAuthorizationCodes"
-		);
-		this.OAuthAccessTokens = mongoose.model("OAuthAccessTokens");
-		this.OAuthRefreshTokens = mongoose.model("OAuthRefreshTokens");
+	constructor(models: Models) {
+		this.OAuthClients = models.OAuthClients;
+		this.OAuthAuthorizationCodes = models.OAuthAuthorizationCodes;
+		this.OAuthAccessTokens = models.OAuthAccessTokens;
+		this.OAuthRefreshTokens = models.OAuthRefreshTokens;
+		this.User = models.User;
 
-		const oauth = new OAuth2(mongoose);
+		const oauth = new OAuth2(models);
 
 		this.server = new OAuth2Server({
 			model: oauth,
@@ -68,7 +68,7 @@ export default class OAuth2Service {
 						if (!client.userId && !userId) {
 							return {};
 						}
-						const user = await User.findOne({
+						const user = await this.User.findOne({
 							...(client.userId && { _id: client.userId }),
 							...(userId && { clerkId: userId }),
 						});
@@ -146,7 +146,7 @@ export default class OAuth2Service {
 			throw new Error("user not found");
 		}
 
-		const user = await User.findOne({ _id: userId });
+		const user = await this.User.findOne({ _id: userId });
 		if(!user) {
 			throw new Error("User not found");
 		}

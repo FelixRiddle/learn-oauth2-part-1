@@ -1,4 +1,5 @@
-import { Model, Mongoose } from "mongoose";
+import Models from "felixriddle.mongodb-models";
+import { Mongoose } from "mongoose";
 import {
 	AuthorizationCode,
 	AuthorizationCodeModel,
@@ -17,28 +18,26 @@ import { v4 as uuidv4 } from "uuid";
  * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#verifyscope-accesstoken-scope-callback
  */
 export default class OAuth2 {
-	OAuthClients: Model<any>;
-	OAuthAuthorizationCodes: Model<any>;
-	OAuthAccessTokens: Model<any>;
-	OAuthRefreshTokens: Model<any>;
+	OAuthClients;
+	OAuthAuthorizationCodes;
+	OAuthAccessTokens;
+	OAuthRefreshTokens;
 
 	/**
 	 * Constructor
 	 */
-	constructor(mongoose: Mongoose) {
-		this.OAuthClients = mongoose.model("OAuthClients");
-		this.OAuthAuthorizationCodes = mongoose.model(
-			"OAuthAuthorizationCodes"
-		);
-		this.OAuthAccessTokens = mongoose.model("OAuthAccessTokens");
-		this.OAuthRefreshTokens = mongoose.model("OAuthRefreshTokens");
+	constructor(models: Models) {
+		this.OAuthClients = models.OAuthClients;
+        this.OAuthAuthorizationCodes = models.OAuthAuthorizationCodes;
+        this.OAuthAccessTokens = models.OAuthAccessTokens;
+        this.OAuthRefreshTokens = models.OAuthRefreshTokens;
 	}
 
 	/**
 	 * Get client
 	 */
 	async getClient(clientId: string, clientSecret?: string) {
-		const client: any = await this.OAuthClients.findOne({
+		const client = await this.OAuthClients.findOne({
 			clientId,
 			...(clientSecret && { clientSecret }),
 		}).lean();
