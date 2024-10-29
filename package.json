@@ -1,6 +1,8 @@
 {
 	"devDependencies": {
 		"@types/node": "^22.8.1",
+		"@types/oauth2-server": "^3.0.18",
+		"felixriddle.ts-app-models": "^1.0.41",
 		"ts-node": "^10.9.2",
 		"tsc": "^2.0.4",
 		"tsx": "^4.19.2",
@@ -21,6 +23,7 @@
 		"make-error": "^1.3.6",
 		"mongoose": "^8.7.3",
 		"node-oauth2-server": "^2.4.0",
+		"oauth2-server": "^3.1.1",
 		"resolve-pkg-maps": "^1.0.0",
 		"undici-types": "^6.19.8",
 		"uuid": "^11.0.2",

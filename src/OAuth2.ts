@@ -3,13 +3,19 @@ import { v4 as uuidv4 } from "uuid";
 
 /**
  * OAuth2
+ * 
+ * Has to follow this specification: 
+ * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#verifyscope-accesstoken-scope-callback
  */
 export default class OAuth2 {
 	OAuthClients: Model<any>;
 	OAuthAuthorizationCodes: Model<any>;
 	OAuthAccessTokens: Model<any>;
 	OAuthRefreshTokens: Model<any>;
-
+	
+	/**
+	 * Constructor
+	 */
 	constructor(mongoose: Mongoose) {
 		this.OAuthClients = mongoose.model("OAuthClients");
 		this.OAuthAuthorizationCodes = mongoose.model(
@@ -187,5 +193,19 @@ export default class OAuth2 {
 				id: token.userId,
 			}
 		};
+	}
+	
+	/**
+	 * Verify scope
+	 */
+	async verifyScope(token: any, scope: string) {
+		if(!token.scope) {
+			return false;
+		}
+		
+		const requestedScopes = scope.split(":");
+		const authorizedScopes = token.scope.split(":");
+		
+		return requestedScopes.every((s) => authorizedScopes.indexOf(s) >= 0);
 	}
 }
