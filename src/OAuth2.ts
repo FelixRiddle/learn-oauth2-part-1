@@ -79,4 +79,24 @@ export default class OAuth2 {
 			}
 		};
 	}
+	
+	/**
+	 * Revoke authorization code
+	 */
+	async revokeAuthorizationCode({ code }: any) {
+		const res = await this.OAuthAuthorizationCodes.deleteOne({
+			authorizationCode: code,
+		});
+		return res.deletedCount === 1;
+	}
+	
+	/**
+	 * Revoke a refresh token
+	 */
+	async revokeRefreshToken({ refreshToken }: any) {
+		const res = await this.OAuthRefreshTokens.deleteOne({
+			authorizationCode: refreshToken,
+		});
+		return res.deletedCount === 1;
+	}
 }
