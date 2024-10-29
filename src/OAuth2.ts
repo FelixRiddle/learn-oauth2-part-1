@@ -1,11 +1,19 @@
 import { Model, Mongoose } from "mongoose";
-import { AuthorizationCode, Falsey } from "oauth2-server";
+import {
+	AuthorizationCode,
+	AuthorizationCodeModel,
+	ClientCredentialsModel,
+	ExtensionModel,
+	Falsey,
+	PasswordModel,
+	RefreshTokenModel,
+} from "oauth2-server";
 import { v4 as uuidv4 } from "uuid";
 
 /**
  * OAuth2
- * 
- * Has to follow this specification: 
+ *
+ * Has to follow this specification:
  * https://oauth2-server.readthedocs.io/en/latest/model/spec.html#verifyscope-accesstoken-scope-callback
  */
 export default class OAuth2 {
@@ -13,7 +21,7 @@ export default class OAuth2 {
 	OAuthAuthorizationCodes: Model<any>;
 	OAuthAccessTokens: Model<any>;
 	OAuthRefreshTokens: Model<any>;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -29,7 +37,7 @@ export default class OAuth2 {
 	/**
 	 * Get client
 	 */
-	async getClient(clientId: string, clientSecret: string) {
+	async getClient(clientId: string, clientSecret?: string) {
 		const client: any = await this.OAuthClients.findOne({
 			clientId,
 			...(clientSecret && { clientSecret }),
@@ -49,7 +57,17 @@ export default class OAuth2 {
 	/**
 	 * Save authorization code
 	 */
-	async saveAuthorizationCode(code: any, client: any, user: any) {
+	async saveAuthorizationCode(
+		code: any,
+		client: any,
+		user: any
+	): Promise<
+		| AuthorizationCodeModel
+		| ClientCredentialsModel
+		| RefreshTokenModel
+		| PasswordModel
+		| ExtensionModel
+	> {
 		const authorizationCode = {
 			authorizationCode: code.authorizationCode,
 			expiresAt: code.expiresAt,
@@ -59,13 +77,15 @@ export default class OAuth2 {
 			userId: user._id,
 		};
 		await this.OAuthAuthorizationCodes.create({ _id: uuidv4() });
-		return authorizationCode;
+		return this;
 	}
 
 	/**
 	 * Get authorization code
 	 */
-	async getAuthorizationCode(authorizationCode: string): Promise<AuthorizationCode | Falsey> {
+	async getAuthorizationCode(
+		authorizationCode: string
+	): Promise<AuthorizationCode | Falsey> {
 		const code: any = await this.OAuthAuthorizationCodes.findOne({
 			authorizationCode,
 		}).lean();
@@ -80,7 +100,7 @@ export default class OAuth2 {
 			scope: code.scope,
 			client: {
 				id: code.clientId,
-				grants: "authorization_code"
+				grants: "authorization_code",
 			},
 			user: {
 				id: code.userId,
@@ -120,8 +140,8 @@ export default class OAuth2 {
 			clientId: client.id,
 			userId: user.id,
 		});
-		
-		if(token.refreshToken) {
+
+		if (token.refreshToken) {
 			await this.OAuthRefreshTokens.create({
 				refreshToken: token.refreshToken,
 				refreshTokenExpiresAt: token.refreshTokenExpiresAt,
@@ -131,7 +151,7 @@ export default class OAuth2 {
 				userId: user.id,
 			});
 		}
-		
+
 		return {
 			accessToken: token.accessToken,
 			accessTokenExpiresAt: token.accessTokenExpiresAt,
@@ -144,22 +164,22 @@ export default class OAuth2 {
 			user: {
 				id: user.id,
 			},
-			
+
 			// other formats, i.e. for Zapier
 			access_token: token.accessToken,
 			refresh_token: token.refreshToken,
 		};
 	}
-	
+
 	/**
 	 * Get access token
 	 */
 	async getAccessToken(accessToken: string) {
 		const token = await this.OAuthAccessTokens.findOne({ accessToken });
-		if(!token) {
+		if (!token) {
 			throw new Error("Refresh token not found");
 		}
-		
+
 		return {
 			accessToken: token.accessToken,
 			accessTokenExpiresAt: token.accessTokenExpiresAt,
@@ -169,10 +189,10 @@ export default class OAuth2 {
 			},
 			user: {
 				id: token.userId,
-			}
+			},
 		};
 	}
-	
+
 	/**
 	 * Get refresh token
 	 */
@@ -180,34 +200,80 @@ export default class OAuth2 {
 		const token: any = await this.OAuthRefreshTokens.findOne({
 			refreshToken,
 		}).lean();
-		if(!token) {
+		if (!token) {
 			throw new Error("Refresh token not found");
 		}
-		
+
 		return {
 			refreshToken: token.refreshToken,
-		    // refreshTokenExpiresAt: token.refreshTokenExpiresAt, // never expires
+			// refreshTokenExpiresAt: token.refreshTokenExpiresAt, // never expires
 			scope: token.scope,
 			client: {
 				id: token.clientId,
 			},
 			user: {
 				id: token.userId,
-			}
+			},
 		};
 	}
-	
+
 	/**
 	 * Verify scope
 	 */
 	async verifyScope(token: any, scope: string) {
-		if(!token.scope) {
+		if (!token.scope) {
 			return false;
 		}
-		
+
 		const requestedScopes = scope.split(":");
 		const authorizedScopes = token.scope.split(":");
-		
+
 		return requestedScopes.every((s) => authorizedScopes.indexOf(s) >= 0);
+	}
+
+	/**
+	 * Create a new client
+	 */
+	async createClient(clientData: any) {
+		// Validate client data
+		const newClient = await this.OAuthClients.create(clientData);
+		return newClient;
+	}
+
+	/**
+	 * Update client
+	 */
+	async updateClient(clientId: string, clientData: any) {
+		// Validate client ID and data
+		const updatedClient = await this.OAuthClients.findOneAndUpdate(
+			{ clientId },
+			clientData,
+			{ new: true }
+		);
+		return updatedClient;
+	}
+
+	/**
+	 * Delete client
+	 */
+	async deleteClient(clientId: string) {
+		const deletedCount = await this.OAuthClients.deleteOne({ clientId });
+		return deletedCount.deletedCount === 1;
+	}
+	
+	/**
+	 * Revoke access token
+	 */
+	async revokeAccessToken({ accessToken }: any) {
+		const res = await this.OAuthAccessTokens.deleteOne({ accessToken });
+		return res.deletedCount === 1;
+	}
+	
+	/**
+	 * Validate client redirect URI
+	 */
+	async validateClientRedirectUri(clientId: string, redirectUri: string) {
+		const client = await this.getClient(clientId);
+		return client.redirectUris.includes(redirectUri);
 	}
 }
