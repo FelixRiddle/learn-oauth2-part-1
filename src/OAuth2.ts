@@ -62,24 +62,24 @@ export default class OAuth2 {
 		const code: any = await this.OAuthAuthorizationCodes.findOne({
 			authorizationCode,
 		}).lean();
-		if(!code) {
+		if (!code) {
 			throw new Error("Authorization code not found");
 		}
-		
+
 		return {
 			code: code.authorizationCode,
 			expiresAt: code.expiresAt,
 			redirectUri: code.redirectUri,
 			scope: code.scope,
 			client: {
-				id: code.clientId
+				id: code.clientId,
 			},
 			user: {
 				id: code.userId,
-			}
+			},
 		};
 	}
-	
+
 	/**
 	 * Revoke authorization code
 	 */
@@ -89,7 +89,7 @@ export default class OAuth2 {
 		});
 		return res.deletedCount === 1;
 	}
-	
+
 	/**
 	 * Revoke a refresh token
 	 */
@@ -99,4 +99,49 @@ export default class OAuth2 {
 		});
 		return res.deletedCount === 1;
 	}
+
+	/**
+	 * Save token
+	 */
+	async saveToken(token: any, client: any, user: any) {
+		await this.OAuthAccessTokens.create({
+			accessToken: token.accessToken,
+			accessTokenExpiresAt: token.accessTokenExpiresAt,
+			scope: token.scope,
+			_id: uuidv4(),
+			clientId: client.id,
+			userId: user.id,
+		});
+		
+		if(token.refreshToken) {
+			await this.OAuthRefreshTokens.create({
+				refreshToken: token.refreshToken,
+				refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+				scope: token.scope,
+				_id: uuidv4(),
+				clientId: client.id,
+				userId: user.id,
+			});
+		}
+		
+		return {
+			accessToken: token.accessToken,
+			accessTokenExpiresAt: token.accessTokenExpiresAt,
+			refreshToken: token.refreshToken,
+			refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+			scope: token.scope,
+			client: {
+				id: client.id,
+			},
+			user: {
+				id: user.id,
+			},
+			
+			// other formats, i.e. for Zapier
+			access_token: token.accessToken,
+			refresh_token: token.refreshToken,
+		};
+	}
+	
+	
 }
