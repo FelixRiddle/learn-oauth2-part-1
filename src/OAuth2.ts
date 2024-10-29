@@ -1,4 +1,5 @@
 import { Model, Mongoose } from "mongoose";
+import { AuthorizationCode, Falsey } from "oauth2-server";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -64,7 +65,7 @@ export default class OAuth2 {
 	/**
 	 * Get authorization code
 	 */
-	async getAuthorizationCode(authorizationCode: string) {
+	async getAuthorizationCode(authorizationCode: string): Promise<AuthorizationCode | Falsey> {
 		const code: any = await this.OAuthAuthorizationCodes.findOne({
 			authorizationCode,
 		}).lean();
@@ -73,12 +74,13 @@ export default class OAuth2 {
 		}
 
 		return {
-			code: code.authorizationCode,
+			authorizationCode: code.authorizationCode,
 			expiresAt: code.expiresAt,
 			redirectUri: code.redirectUri,
 			scope: code.scope,
 			client: {
 				id: code.clientId,
+				grants: "authorization_code"
 			},
 			user: {
 				id: code.userId,
