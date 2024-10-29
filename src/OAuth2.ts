@@ -143,5 +143,25 @@ export default class OAuth2 {
 		};
 	}
 	
-	
+	/**
+	 * Get access token
+	 */
+	async getAccessToken(accessToken: string) {
+		const token = await this.OAuthAccessTokens.findOne({ accessToken });
+		if(!token) {
+			throw new Error("Refresh token not found");
+		}
+		
+		return {
+			accessToken: token.accessToken,
+			accessTokenExpiresAt: token.accessTokenExpiresAt,
+			scope: token.scope,
+			client: {
+				id: token.clientId,
+			},
+			user: {
+				id: token.userId,
+			}
+		};
+	}
 }
