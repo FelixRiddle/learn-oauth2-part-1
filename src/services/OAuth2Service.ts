@@ -40,7 +40,7 @@ export default class OAuth2Service {
 	async authorize(req: Request, res: Response) {
 		const request = new OAuth2Request(req);
 		const response = new OAuth2Response(res);
-		return this.server
+		return await this.server
 			.authorize(request, response, {
 				authenticateHandler: {
 					handle: async () => {
