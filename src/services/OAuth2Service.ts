@@ -108,24 +108,25 @@ export default class OAuth2Service {
 			})
 			.catch((err) => {
 				console.log(`Error`);
-                console.error(err);
-                return res
-                    .status(err.code || 500)
-                    .json(err instanceof Error? { error: err.message } : err);
+				console.error(err);
+				return res
+					.status(err.code || 500)
+					.json(err instanceof Error ? { error: err.message } : err);
 			});
 	}
-	
+
 	/**
 	 * Authenticate
 	 */
 	async authenticate(req: Request, res: Response, next: NextFunction) {
 		const request = new OAuth2Request(req);
 		const response = new OAuth2Response(res);
-		return this.server.authenticate(request, response)
+		return this.server
+			.authenticate(request, response)
 			.then((data) => {
 				req.auth = {
 					userId: data?.user?.id,
-					sessionType: "oauth2"
+					sessionType: "oauth2",
 				};
 				return next();
 			})
@@ -134,5 +135,22 @@ export default class OAuth2Service {
 				console.error(err);
 				return res.status(err.code || 500);
 			});
+	}
+
+	/**
+	 * Test
+	 */
+	async test(req: Request, res: Response) {
+		const { userId } = req.auth || {};
+		if (!userId) {
+			throw new Error("user not found");
+		}
+
+		const user = await User.findOne({ _id: userId });
+		if(!user) {
+			throw new Error("User not found");
+		}
+		
+		return res.json({ _id: user._id, username: user.username });
 	}
 }
