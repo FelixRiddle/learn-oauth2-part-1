@@ -1,6 +1,6 @@
 import express from "express";
 import Models from "felixriddle.mongodb-models";
-import mainRouter from "routes";
+import mainRouter from "@/tutorial-1/routes";
 
 /**
  * Run express server

@@ -1,7 +1,7 @@
 import yargs from "yargs";
 import dotenv from "dotenv";
 
-import runExpressServer from "@/server";
+import runExpressServer from "@/tutorial-1/server";
 import Models from "felixriddle.mongodb-models";
 import { initializeDotenv } from "felixriddle.ts-app-models";
 

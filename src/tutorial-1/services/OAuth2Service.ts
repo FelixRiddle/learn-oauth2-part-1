@@ -1,10 +1,11 @@
-import OAuth2 from "@/OAuth2";
 import OAuth2Server, {
 	Request as OAuth2Request,
 	Response as OAuth2Response,
 } from "oauth2-server";
 import { NextFunction, Request, Response } from "express";
 import Models from "felixriddle.mongodb-models";
+
+import OAuth2 from "@/OAuth2";
 
 /**
  * OAuth2 service

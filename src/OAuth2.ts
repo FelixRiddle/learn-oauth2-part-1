@@ -1,5 +1,4 @@
 import Models from "felixriddle.mongodb-models";
-import { Mongoose } from "mongoose";
 import {
 	AuthorizationCode,
 	AuthorizationCodeModel,
@@ -28,9 +27,9 @@ export default class OAuth2 {
 	 */
 	constructor(models: Models) {
 		this.OAuthClients = models.OAuthClients;
-        this.OAuthAuthorizationCodes = models.OAuthAuthorizationCodes;
-        this.OAuthAccessTokens = models.OAuthAccessTokens;
-        this.OAuthRefreshTokens = models.OAuthRefreshTokens;
+		this.OAuthAuthorizationCodes = models.OAuthAuthorizationCodes;
+		this.OAuthAccessTokens = models.OAuthAccessTokens;
+		this.OAuthRefreshTokens = models.OAuthRefreshTokens;
 	}
 
 	/**
@@ -59,7 +58,7 @@ export default class OAuth2 {
 	async saveAuthorizationCode(
 		code: any,
 		client: Models["OAuthClients"],
-		user: Models["User"],
+		user: Models["User"]
 	): Promise<
 		| AuthorizationCodeModel
 		| ClientCredentialsModel
@@ -75,8 +74,11 @@ export default class OAuth2 {
 			clientId: client.id,
 			userId: user._id,
 		};
-		
-		const authorizationCode = await this.OAuthAuthorizationCodes.create({ _id: uuidv4(),  });
+
+		await this.OAuthAuthorizationCodes.create({
+			_id: uuidv4(),
+			...authorizationCode,
+		});
 		return authorizationCode;
 	}
 	// const authorizationCode = {
@@ -268,7 +270,7 @@ export default class OAuth2 {
 		const deletedCount = await this.OAuthClients.deleteOne({ clientId });
 		return deletedCount.deletedCount === 1;
 	}
-	
+
 	/**
 	 * Revoke access token
 	 */
@@ -276,7 +278,7 @@ export default class OAuth2 {
 		const res = await this.OAuthAccessTokens.deleteOne({ accessToken });
 		return res.deletedCount === 1;
 	}
-	
+
 	/**
 	 * Validate client redirect URI
 	 */

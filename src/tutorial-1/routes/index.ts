@@ -1,6 +1,7 @@
 import express from "express";
-import OAuth2Service from "@/services/OAuth2Service";
 import Models from "felixriddle.mongodb-models";
+
+import OAuth2Service from "@/tutorial-1/services/OAuth2Service";
 
 /**
  * Main router
