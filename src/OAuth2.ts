@@ -58,8 +58,8 @@ export default class OAuth2 {
 	 */
 	async saveAuthorizationCode(
 		code: any,
-		client: any,
-		user: any
+		client: Models["OAuthClients"],
+		user: Models["User"],
 	): Promise<
 		| AuthorizationCodeModel
 		| ClientCredentialsModel
@@ -75,9 +75,18 @@ export default class OAuth2 {
 			clientId: client.id,
 			userId: user._id,
 		};
-		await this.OAuthAuthorizationCodes.create({ _id: uuidv4() });
-		return this;
+		
+		const authorizationCode = await this.OAuthAuthorizationCodes.create({ _id: uuidv4(),  });
+		return authorizationCode;
 	}
+	// const authorizationCode = {
+	// 	authorizationCode: code.authorizationCode,
+	// 	expiresAt: code.expiresAt,
+	// 	redirectUri: code.redirectUri,
+	// 	scope: code.scope,
+	// 	clientId: client.id,
+	// 	userId: user._id,
+	// };
 
 	/**
 	 * Get authorization code

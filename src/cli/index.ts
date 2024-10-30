@@ -12,7 +12,7 @@ export default async function cli() {
 	dotenv.config();
 	initializeDotenv();
 
-	const models = new Models();
+	const models = await Models.create();
 
 	yargs
 		.option("port", {
